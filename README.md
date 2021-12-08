@@ -38,6 +38,58 @@ Download the pre-computed features file [flickr30k_detections.hdf5](http://ailb-
 ### Download from Google Drive
 A copy of all files is also available at this [Google Drive folder](https://drive.google.com/drive/folders/1kdOlOAfEeovy8kQbdbLTJNaOhRvTcP6q?usp=sharing).
 
+## Training procedure
+Run `python train.py` using the following arguments:
+
+| Argument | Possible values |
+|------|------|
+| `--exp_name` | Experiment name |
+| `--batch_size` | Batch size (default: 100) |
+| `--lr` | Initial learning rate (default: 5e-4) |
+| `--nb_workers` | Number of workers (default: 0) |
+| `--sample_rl` | If used, the model will be trained with CIDEr optimization |
+| `--sample_rl_nw` | If used, the model will be trained with CIDEr + NW optimization |
+
+For example, to train the model with cross entropy, use:
+```
+python train.py --exp_name show_control_and_tell --batch_size 100 --lr 5e-4 
+```
+
+To train the model with CIDEr optimization (after training the model with cross entropy), use:
+```
+python train.py --exp_name show_control_and_tell --batch_size 100 --lr 5e-5 --sample_rl
+```
+
+To train the model with CIDEr + NW optimization (after training the model with cross entropy), use:
+```
+python train.py --exp_name show_control_and_tell --batch_size 100 --lr 5e-5 --sample_rl_nw
+```
+
+Note: the current training code only supports the use of the COCO Entities dataset.
+
+![model](images/model.png)
+
+
+## Generating Diverse Captions
+
+To reproduce the numbers in our report, please run the following commands after downloading datasets and training.
+
+### Permuting image region sequence
+```
+python permuting.py --dataset coco --exp_name ours --sample_rl_nw  
+```
+
+### Hard mask
+```
+python hardmasking.py --dataset coco --exp_name ours --sample_rl_nw  
+```
+
+### Soft mask
+```
+python softmasking.py --dataset coco --exp_name ours --sample_rl_nw  
+```
+
+
 ## Evaluation
 To reproduce the results in the paper, download the pretrained model file [saved_models.tgz](http://ailb-web.ing.unimore.it/releases/show-control-and-tell/saved_models.tgz) (~4 GB) and extract it in the code folder with `tar -xzvf saved_models.tgz`.
 
@@ -78,36 +130,6 @@ python test_region_set.py --dataset coco --exp_name ours --sample_rl_nw
 ### Expected output
 Under `logs/`, you may also find the expected output of all experiments. 
 
-## Training procedure
-Run `python train.py` using the following arguments:
-
-| Argument | Possible values |
-|------|------|
-| `--exp_name` | Experiment name |
-| `--batch_size` | Batch size (default: 100) |
-| `--lr` | Initial learning rate (default: 5e-4) |
-| `--nb_workers` | Number of workers (default: 0) |
-| `--sample_rl` | If used, the model will be trained with CIDEr optimization |
-| `--sample_rl_nw` | If used, the model will be trained with CIDEr + NW optimization |
-
-For example, to train the model with cross entropy, use:
-```
-python train.py --exp_name show_control_and_tell --batch_size 100 --lr 5e-4 
-```
-
-To train the model with CIDEr optimization (after training the model with cross entropy), use:
-```
-python train.py --exp_name show_control_and_tell --batch_size 100 --lr 5e-5 --sample_rl
-```
-
-To train the model with CIDEr + NW optimization (after training the model with cross entropy), use:
-```
-python train.py --exp_name show_control_and_tell --batch_size 100 --lr 5e-5 --sample_rl_nw
-```
-
-Note: the current training code only supports the use of the COCO Entities dataset.
-
-![model](images/model.png)
 
 ## COCO Entities
 If you want to use only the annotations of our COCO Entities dataset, you can download the annotation file [coco_entities_release.json](http://ailb-web.ing.unimore.it/releases/show-control-and-tell/coco_entities_release.json) (~403 MB).
